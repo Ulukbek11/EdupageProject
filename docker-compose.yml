@@ -1,0 +1,55 @@
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: edupage-postgres
+    environment:
+      POSTGRES_DB: edupage
+      POSTGRES_USER: edupage
+      POSTGRES_PASSWORD: edupage123
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - edupage-network
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U edupage" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build: ./backend
+    container_name: edupage-backend
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/edupage
+      SPRING_DATASOURCE_USERNAME: edupage
+      SPRING_DATASOURCE_PASSWORD: edupage123
+      SPRING_DATASOURCE_DRIVER_CLASS_NAME: org.postgresql.Driver
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: org.hibernate.dialect.PostgreSQLDialect
+      JWT_SECRET: myVerySecretKeyForJWTTokenGenerationThatIsAtLeast256BitsLong2024
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - edupage-network
+
+  frontend:
+    build: ./frontend
+    container_name: edupage-frontend
+    ports:
+      - "5173:80"
+    depends_on:
+      - backend
+    networks:
+      - edupage-network
+
+networks:
+  edupage-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
