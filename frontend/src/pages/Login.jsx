@@ -80,8 +80,8 @@ export default function Login() {
                 <div style={{ marginTop: '1.5rem', textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.85rem' }}>
                     <p>Demo Credentials:</p>
                     <p>Admin: admin@edupage.com / admin123</p>
-                    <p>Teacher: john.smith@edupage.com / teacher123</p>
-                    <p>Student: alice.johnson@edupage.com / student123</p>
+                    <p>Teacher: teacher1@edupage.com / teacher123</p>
+                    <p>Student: student1@edupage.com / student123</p>
                 </div>
             </div>
         </div>
