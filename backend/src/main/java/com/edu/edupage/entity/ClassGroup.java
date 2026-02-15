@@ -23,6 +23,9 @@ public class ClassGroup {
 
     private Integer grade; // e.g., 10, 11
 
+    @Column(nullable = false)
+    private Integer monthlyFee; // Monthly fee in KGS
+
     @OneToMany(mappedBy = "classGroup", cascade = CascadeType.ALL)
     @Builder.Default
     private List<Student> students = new ArrayList<>();

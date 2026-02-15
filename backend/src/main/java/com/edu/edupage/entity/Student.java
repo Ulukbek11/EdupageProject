@@ -23,5 +23,9 @@ public class Student {
     @JoinColumn(name = "class_group_id")
     private ClassGroup classGroup;
 
+    @Column(unique = true)
     private String studentNumber; // Optional student ID number
+
+    @Column(nullable = false, unique = true)
+    private String accountNumber; // Unique payment account number
 }

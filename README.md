@@ -1,148 +1,59 @@
-# Edupage - School Management System
+# EduPage - Testing & Verification Sequence
 
-A full-stack school management application built with React, Spring Boot, and PostgreSQL.
+This guide provides a step-by-step path to verify the core financial and administrative workflows. 
 
-## Features
+### Phase 1: Authentication & Setup
+1. **Login as Admin**
+   - **POST** `/api/auth/login`
+   - Body: `{ "email": "admin@edupage.com", "password": "admin123" }`
+   - *Result: Copy the 'token' for subsequent requests.*
 
-### Students
-- View weekly schedule
-- Track attendance
-- View grades and averages
-- Read announcements
+2. **Create a Accountant**
+   - **POST** `/api/auth/register`
+   - Body: `{ "email": "accountant@edupage.com", "password": "password123", "firstName": "Finance", "lastName": "Manager", "role": "ACCOUNTANT" }`
 
-### Teachers
-- View teaching schedule
-- Mark student attendance
-- Add and manage grades
-- Create announcements
+3. **Create a Student**
+   - **POST** `/api/auth/register`
+   - Body: `{ "email": "student.new@edupage.com", "password": "password123", "firstName": "Alex", "lastName": "Doe", "role": "STUDENT" }`
+   - *Result: Note the 'id' and 'accountNumber' from the response.*
 
-### Admins
-- Manage all schedules (create/edit/auto-generate)
-- Manage users (students, teachers, admins)
-- Create system-wide announcements
-- View all data
+### Phase 2: Administrative Organization
+4. **Create a Class Group**
+   - **POST** `/api/admin/class-groups`
+   - Body: `{ "name": "Grade-10", "grade": 10, "monthlyFee": 4000 }`
+   - *Result: Note the 'id' (let's assume it's 1).*
 
-## Tech Stack
+5. **Assign Student to Class**
+   - **PUT** `/api/admin/students/{id}/class`
+   - Body: `{ "classGroupId": 1 }`
 
-- **Frontend**: React 18, Vite, React Router
-- **Backend**: Spring Boot 3.2, Spring Security, JWT
-- **Database**: PostgreSQL 15
-- **Containerization**: Docker, Docker Compose
+### Phase 3: Invoicing & Debt Management
+6. **Generate Monthly Invoice** (Admin Only)
+   - **POST** `/api/invoices/generate/student?studentId={id}&year=2024&month=3`
+   - *Result: This links the student to a 4000 unit debt.*
 
-## Quick Start
+7. **Verify Debt Status**
+   - **GET** `/api/invoices/debt/{id}`
+   - *Output should reflect the 4000 unit balance.*
 
-### Using Docker Compose (Recommended)
+### Phase 4: Payment Submission (Student Flow)
+8. **Login as Student**
+   - **POST** `/api/auth/login`
+   - Body: `{ "email": "student.new@edupage.com", "password": "password123" }`
 
-```bash
-# Clone the repository
-cd edupagel
+9. **Submit Payment Request**
+   - **POST** `/api/payment/submit`
+   - Body: `{ "accountNumber": "{accountNumber}", "amount": 4000, "receiptNumber": "TXN-998877" }`
 
-# Start all services
-docker-compose up --build
+### Phase 5: Accountant Approval
+10. **Login as Accountant**
+    - **POST** `/api/auth/login`
+    - Body: `{ "email": "accountant@edupage.com", "password": "password123" }`
 
-# Access the application
-# Frontend: http://localhost:5173
-# Backend API: http://localhost:8080
-```
+11. **Review & Approve**
+    - **GET** `/api/payment/pending` -> Note the payment 'id'.
+    - **POST** `/api/payment/{id}/approve`
 
-### Local Development
-
-#### Backend
-
-```bash
-cd backend
-
-# Start PostgreSQL (required)
-docker run -d \
-  --name edupage-db \
-  -e POSTGRES_DB=edupage \
-  -e POSTGRES_USER=edupage \
-  -e POSTGRES_PASSWORD=edupage123 \
-  -p 5432:5432 \
-  postgres:15-alpine
-
-# Run the backend
-./mvnw spring-boot:run
-```
-
-#### Frontend
-
-```bash
-cd frontend
-
-# Install dependencies
-npm install
-
-# Start development server
-npm run dev
-```
-
-## Demo Credentials
-
-After starting the application, the database will be seeded with demo data:
-
-| Role | Email | Password |
-|------|-------|----------|
-| Admin | admin@edupage.com | admin123 |
-| Teacher | john.smith@edupage.com | teacher123 |
-| Teacher | jane.doe@edupage.com | teacher123 |
-| Teacher | bob.wilson@edupage.com | teacher123 |
-| Student | alice.johnson@edupage.com | student123 |
-| Student | charlie.brown@edupage.com | student123 |
-| Student | emma.davis@edupage.com | student123 |
-
-## API Endpoints
-
-### Authentication
-- `POST /api/auth/login` - User login
-- `POST /api/auth/register` - Register new user (Admin only)
-
-### Schedule
-- `GET /api/schedule/week` - Get weekly schedule
-- `POST /api/schedule` - Create schedule entry (Admin)
-- `POST /api/schedule/generate` - Auto-generate schedule (Admin)
-
-### Attendance
-- `GET /api/attendance` - Get student's attendance
-- `POST /api/attendance` - Mark attendance (Teacher)
-
-### Grades
-- `GET /api/grades` - Get student's grades
-- `POST /api/grades` - Add grade (Teacher)
-
-### Announcements
-- `GET /api/announcements` - Get announcements
-- `POST /api/announcements` - Create announcement (Teacher/Admin)
-
-## Project Structure
-
-```
-edupagel/
-├── backend/
-│   ├── src/main/java/com/edu/edupage/
-│   │   ├── config/         # Security, CORS configuration
-│   │   ├── controller/     # REST controllers
-│   │   ├── dto/            # Data transfer objects
-│   │   ├── entity/         # JPA entities
-│   │   ├── exception/      # Custom exceptions
-│   │   ├── repository/     # JPA repositories
-│   │   ├── security/       # JWT authentication
-│   │   └── service/        # Business logic
-│   ├── Dockerfile
-│   └── pom.xml
-├── frontend/
-│   ├── src/
-│   │   ├── components/     # Reusable UI components
-│   │   ├── context/        # React context
-│   │   ├── pages/          # Page components
-│   │   ├── services/       # API services
-│   │   └── App.jsx
-│   ├── Dockerfile
-│   └── package.json
-├── docker-compose.yml
-└── README.md
-```
-
-## License
-
-MIT License
+12. **Final Debt Check**
+    - **GET** `/api/invoices/debt/{studentId}`
+    - *Result: Total debt should now be 0.*

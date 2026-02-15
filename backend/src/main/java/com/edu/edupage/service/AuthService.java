@@ -57,8 +57,10 @@ public class AuthService {
 
         // Create role-specific profile
         if (request.getRole() == Role.STUDENT) {
+            String accountNumber = generateUniqueAccountNumber();
             Student student = Student.builder()
                     .user(user)
+                    .accountNumber(accountNumber)
                     .build();
 
             if (request.getClassGroupId() != null) {
@@ -89,6 +91,15 @@ public class AuthService {
 
         String token = jwtTokenProvider.generateToken(user.getEmail());
         return buildAuthResponse(user, token);
+    }
+
+    private String generateUniqueAccountNumber() {
+        String accountNumber;
+        do {
+            // Generate a random 8-digit number string
+            accountNumber = String.valueOf((int) (Math.random() * 90000000) + 10000000);
+        } while (studentRepository.existsByAccountNumber(accountNumber));
+        return accountNumber;
     }
 
     private AuthResponse buildAuthResponse(User user, String token) {
