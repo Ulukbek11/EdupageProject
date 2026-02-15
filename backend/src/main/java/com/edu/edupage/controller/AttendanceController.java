@@ -26,6 +26,7 @@ public class AttendanceController {
     private final StudentRepository studentRepository;
 
     @GetMapping
+    @PreAuthorize("hasRole('STUDENT')")
     public ResponseEntity<List<AttendanceDTO>> getMyAttendance(@AuthenticationPrincipal User user) {
         var student = studentRepository.findByUserId(user.getId())
                 .orElseThrow(() -> new IllegalStateException("Student profile not found"));
@@ -33,6 +34,7 @@ public class AttendanceController {
     }
 
     @GetMapping("/range")
+    @PreAuthorize("hasRole('STUDENT')")
     public ResponseEntity<List<AttendanceDTO>> getMyAttendanceByDateRange(
             @AuthenticationPrincipal User user,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
@@ -45,6 +47,7 @@ public class AttendanceController {
     }
 
     @GetMapping("/stats")
+    @PreAuthorize("hasRole('STUDENT')")
     public ResponseEntity<Map<String, Long>> getMyAttendanceStats(@AuthenticationPrincipal User user) {
         var student = studentRepository.findByUserId(user.getId())
                 .orElseThrow(() -> new IllegalStateException("Student profile not found"));

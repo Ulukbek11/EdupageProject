@@ -26,6 +26,7 @@ public class GradeController {
     private final TeacherRepository teacherRepository;
 
     @GetMapping
+    @PreAuthorize("hasRole('STUDENT')")
     public ResponseEntity<List<GradeDTO>> getMyGrades(@AuthenticationPrincipal User user) {
         var student = studentRepository.findByUserId(user.getId())
                 .orElseThrow(() -> new IllegalStateException("Student profile not found"));
@@ -33,6 +34,7 @@ public class GradeController {
     }
 
     @GetMapping("/subject/{subjectId}")
+    @PreAuthorize("hasRole('STUDENT')")
     public ResponseEntity<List<GradeDTO>> getMyGradesBySubject(
             @AuthenticationPrincipal User user,
             @PathVariable Long subjectId) {
@@ -42,6 +44,7 @@ public class GradeController {
     }
 
     @GetMapping("/averages")
+    @PreAuthorize("hasRole('STUDENT')")
     public ResponseEntity<Map<String, Double>> getMyGradeAverages(@AuthenticationPrincipal User user) {
         var student = studentRepository.findByUserId(user.getId())
                 .orElseThrow(() -> new IllegalStateException("Student profile not found"));
