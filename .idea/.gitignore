@@ -1,0 +1,19 @@
+# Maven build output
+/target/
+*.class
+
+# IntelliJ IDEA
+/.idea/
+*.iml
+/workspace.xml
+/shelf/
+
+# IDE HTTP client requests
+/httpRequests/
+
+# Environment-dependent Maven files
+/mavenHomeManager.xml
+
+# Datasource local storage
+/dataSources/
+ /dataSources.local.xml

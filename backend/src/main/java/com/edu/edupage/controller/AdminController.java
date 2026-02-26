@@ -83,6 +83,48 @@ public class AdminController {
                 student = studentRepository.save(student);
                 return ResponseEntity.ok(mapToStudentDTO(student));
         }
+        @PostMapping("/subjects")
+        @PreAuthorize("hasRole('ADMIN')")
+
+        public ResponseEntity<SubjectDTO> createSubject(@RequestBody CreateSubjectRequest request) {
+                Subject subject = Subject.builder()
+                        .name(request.name())
+                        .description(request.description())
+                        .hoursPerWeek(request.hoursPerWeek() != null ? request.hoursPerWeek() : 2)
+                        .build();
+                subject = subjectRepository.save(subject);
+                return ResponseEntity.ok(mapToSubjectDTO(subject));
+        }
+
+        @PutMapping("/subjects/{id}")
+        @PreAuthorize("hasRole('ADMIN')")
+
+        public ResponseEntity<SubjectDTO> updateSubject(
+                @PathVariable Long id,
+                @RequestBody CreateSubjectRequest request) {
+                Subject subject = subjectRepository.findById(id)
+                        .orElseThrow(() -> new ResourceNotFoundException("Subject", "id", id));
+
+                subject.setName(request.name());
+                subject.setDescription(request.description());
+                if (request.hoursPerWeek() != null) {
+                        subject.setHoursPerWeek(request.hoursPerWeek());
+                }
+                subject = subjectRepository.save(subject);
+                return ResponseEntity.ok(mapToSubjectDTO(subject));
+        }
+
+        @DeleteMapping("/subjects/{id}")
+        @PreAuthorize("hasRole('ADMIN')")
+
+        public ResponseEntity<Void> deleteSubject(@PathVariable Long id) {
+                if (!subjectRepository.existsById(id)) {
+                        throw new ResourceNotFoundException("Subject", "id", id);
+                }
+                subjectRepository.deleteById(id);
+                return ResponseEntity.noContent().build();
+        }
+
 
         @PutMapping("/students/bulk-assign")
         @PreAuthorize("hasRole('ADMIN')")

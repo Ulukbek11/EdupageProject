@@ -43,7 +43,7 @@ public class DataSeeder implements CommandLineRunner {
                                 .save(ClassGroup.builder().name("11A").grade(11).monthlyFee(3500).build());
 
                 userRepository.save(
-                                User.builder().email("admin@edupage.com").password(passwordEncoder.encode("admin123"))
+                                        User.builder().email("admin@edupage.com").password(passwordEncoder.encode("admin123"))
                                                 .firstName("System").lastName("Admin").role(Role.ADMIN).build());
                 userRepository.save(User.builder().email("finance@edupage.com")
                                 .password(passwordEncoder.encode("finance123")).firstName("Main").lastName("Accountant")
